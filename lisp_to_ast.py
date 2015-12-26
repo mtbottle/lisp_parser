@@ -1,6 +1,7 @@
 def split(string, char):
     return [x for x in string.split(char) if x]
 
+
 def parse_lisp_root(lisp_code):
     """ Method to parse lisp code and turn it into an abstract syntax tree. 
         TODO: write some more description about the abstract syntax tree.
@@ -25,7 +26,8 @@ def parse_lisp_helper(lisp_code, start_index):
 
     # base case, no more opening paren
     if next_opening_paren < 0 or next_opening_paren > first_closing_paren:
-        return split(lisp_code[start_index+1:first_closing_paren], " "), first_closing_paren
+        return split(lisp_code[start_index+1:first_closing_paren], " "), \
+                first_closing_paren
 
     # inductive case
     ast = split(lisp_code[start_index+1: next_opening_paren], " ")
@@ -38,11 +40,13 @@ def parse_lisp_helper(lisp_code, start_index):
     # now finish parsing everything else after the last set of parens
     if first_closing_paren > -1:
         next_closing_paren = lisp_code.find(")", first_closing_paren+1)
-        ast.extend(split(lisp_code[first_closing_paren+1:next_closing_paren], " "))
+        ast.extend(split(lisp_code[first_closing_paren+1:next_closing_paren], \
+                         " "))
     else:
         next_closing_paren = len(lisp_code)
 
     return ast, next_closing_paren
+
 
 if __name__ == "__main__":
     print parse_lisp_helper("(first (list 1 (+ 2 3) 9))", 0)
