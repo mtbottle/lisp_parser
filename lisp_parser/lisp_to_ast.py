@@ -2,14 +2,9 @@ def split(string, char):
     return [x for x in string.split(char) if x]
 
 
-def parse_lisp_root(lisp_code):
-    """ Method to parse lisp code and turn it into an abstract syntax tree. 
-        TODO: write some more description about the abstract syntax tree.
-
-        ** very inefficient code
-    """
-    result, last_bracket = parse_lisp_helper(lisp_code)
-    return result
+def split_and_cast(string, split_char):
+    split_string = split(string, split_char)
+    return [float(x) if x.isnumeric() else x for x in split_string]
 
 
 def parse_lisp_helper(lisp_code, start_index):
@@ -26,21 +21,28 @@ def parse_lisp_helper(lisp_code, start_index):
 
     # base case, no more opening paren
     if next_opening_paren < 0 or next_opening_paren > first_closing_paren:
-        return split(lisp_code[start_index+1:first_closing_paren], " "), \
+        return split_and_cast(lisp_code[start_index+1:first_closing_paren], " "), \
                 first_closing_paren
 
     # inductive case
-    ast = split(lisp_code[start_index+1: next_opening_paren], " ")
-    while next_opening_paren > 0 and lisp_code[first_closing_paren:]:
+    ast = split_and_cast(lisp_code[start_index+1: next_opening_paren], " ")
+    while next_opening_paren > 0 and lisp_code[first_closing_paren:]: 
         sub_ast, first_closing_paren = parse_lisp_helper(lisp_code,
                                                          next_opening_paren)
-        next_opening_paren = lisp_code.find("(", first_closing_paren+1)
         ast.append(sub_ast)
+        next_opening_paren = lisp_code.find("(", first_closing_paren+1)
+
+        # add all the scalar values between the closing bracket, and next
+        # opening bracket
+        if next_opening_paren > 0 and next_opening_paren > first_closing_paren:
+            values = split_and_cast(lisp_code[first_closing_paren+1:next_opening_paren], " ")
+            ast.extend(values)
+
 
     # now finish parsing everything else after the last set of parens
     if first_closing_paren > -1:
         next_closing_paren = lisp_code.find(")", first_closing_paren+1)
-        ast.extend(split(lisp_code[first_closing_paren+1:next_closing_paren], \
+        ast.extend(split_and_cast(lisp_code[first_closing_paren+1:next_closing_paren], \
                          " "))
     else:
         next_closing_paren = len(lisp_code)
@@ -48,8 +50,3 @@ def parse_lisp_helper(lisp_code, start_index):
     return ast, next_closing_paren
 
 
-if __name__ == "__main__":
-    print parse_lisp_helper("(first (list 1 (+ 2 3) 9))", 0)
-    print parse_lisp_helper("(first (list (+ 1 2) (- 4 1) 9 (+ 5 6)))", 0)
-    print parse_lisp_helper("(list 8 9 3)", 0)
-    print parse_lisp_helper("(cdr (list (car (list 1 (+ 2 5))) (- 2 4) 4 (- 5 8)))", 0)
