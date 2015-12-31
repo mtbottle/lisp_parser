@@ -1,11 +1,13 @@
 from lisp_parser.lisp_to_ast import parse_lisp_helper
 import pytest
 
+
 def test_parse_example():
     lisp_code = "(first (list 1 (+ 2 3) 9))"
     ast, final_bracket = parse_lisp_helper(lisp_code, 0)
     assert final_bracket == len(lisp_code) - 1
     assert ["first", ["list", 1, ["+", 2, 3], 9]] == ast
+
 
 def test_parse_one_layer():
     lisp_code = "(list 8 9 3)"
@@ -17,5 +19,32 @@ def test_parse_one_layer():
 def test_parse_bracket_after_end():
     lisp_code = "(list 1 (+ 2 5) 4 (- 5 8))"
     ast, final_bracket = parse_lisp_helper(lisp_code, 0)
+    assert final_bracket == len(lisp_code) - 1
     assert ["list", 1, ["+", 2, 5], 4, ["-", 5, 8]] == ast
+
+
+def test_parse_empty():
+    lisp_code = "()"
+    ast, final_bracket = parse_lisp_helper(lisp_code, 0)
+    assert final_bracket == len(lisp_code) - 1
+    assert [] == ast
+
+
+def test_parse_double_empty():
+    lisp_code = "(())"
+    ast, final_bracket = parse_lisp_helper(lisp_code, 0)
+    assert final_bracket == len(lisp_code) - 1
+    assert [[]] == ast
+
+
+def test_not_well_formatted():
+    lisp_code = "(list 8 9 3"
+    ast, final_bracket = parse_lisp_helper(lisp_code, 0)
+    assert final_bracket != len(lisp_code) - 1
+
+
+
+
+
+
 
