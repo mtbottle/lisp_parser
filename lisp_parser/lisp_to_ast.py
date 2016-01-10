@@ -50,3 +50,30 @@ def parse_lisp_helper(lisp_code, start_index):
     return ast, next_closing_paren
 
 
+def list(*args):
+    return args
+
+
+def first(*args):
+    return args.pop(0)
+
+
+def run_ast(ast):
+    """
+    Given an ast, execute the code in the ast.
+    """
+    # base case, this is not a list, so just return value 
+    if type(ast) != list:
+        return ast
+
+    # inductive case, get the function and run function on rest of the params
+    function_name = ast[0]
+    # TODO: this can be streamlined, with some metaprogramming
+    if function_name == "list":
+        func = list
+    elif function_name == "first":
+        func = first
+
+    return func(map(run_ast, ast[1:]))
+
+
